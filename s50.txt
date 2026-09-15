@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Board — Notes on Chess Strategy</title>
+<meta name="description" content="An informational page on chess fundamentals, piece movement, and opening principles.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #EAEAE2;
+    --panel: #DEDED2;
+    --ink: #1C1C18;
+    --maroon: #7A2E2E;
+    --gold: #A9822F;
+    --line: #C7C7B8;
+    --muted: #62625A;
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3{ font-family: 'Crimson Pro', serif; font-weight: 500; }
+  .mono{ font-family: 'IBM Plex Mono', monospace; }
+
+  @media (prefers-reduced-motion: no-preference){
+    .fade-in{ animation: fadeUp 0.9s ease-out both; }
+    .fade-in.delay-1{ animation-delay: 0.15s; }
+    .fade-in.delay-2{ animation-delay: 0.3s; }
+    @keyframes fadeUp{
+      from{ opacity:0; transform: translateY(10px); }
+      to{ opacity:1; transform: translateY(0); }
+    }
+  }
+
+  a{ color: var(--maroon); }
+  a:focus-visible, button:focus-visible{ outline: 2px solid var(--maroon); outline-offset: 3px; }
+
+  .wrap{ max-width: 1180px; margin: 0 auto; padding: 0 40px; }
+  svg{ display:block; }
+
+  /* ---- Nav ---- */
+  nav{ padding: 24px 40px; border-bottom: 1px solid var(--line); }
+  nav .wrap{ display:flex; align-items:center; justify-content:space-between; }
+  .brand{ font-family:'Crimson Pro',serif; font-size: 1.35rem; font-weight: 600; }
+  .nav-links{ display:flex; gap: 30px; font-size: 0.92rem; }
+  .nav-links a{ text-decoration: none; color: var(--muted); }
+  .nav-links a:hover{ color: var(--ink); }
+
+  /* ---- Hero ---- */
+  header.hero{ padding: 66px 0; border-bottom: 1px solid var(--line); }
+  header.hero .wrap{
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 56px;
+    align-items: center;
+  }
+  header.hero .kicker{ color: var(--maroon); font-size: 0.95rem; margin: 0 0 16px; font-weight:500; }
+  header.hero h1{
+    font-size: clamp(2.2rem, 3.6vw, 3rem);
+    font-weight: 500;
+    line-height: 1.2;
+    margin: 0 0 22px;
+    max-width: 15ch;
+  }
+  header.hero p.lede{ font-size: 1.08rem; color: #34342C; max-width: 46ch; margin: 0 0 26px; }
+  .hero-stats{ display: flex; gap: 30px; }
+  .hero-stats div strong{ display:block; font-family:'IBM Plex Mono',monospace; font-size: 1.3rem; color: var(--maroon); }
+  .hero-stats div span{ font-size: 0.76rem; color: var(--muted); }
+  .hero-art{ background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 22px; }
+
+  section{ padding: 58px 0; border-bottom: 1px solid var(--line); }
+  section h2{ font-size: 1.55rem; font-weight: 500; margin: 0 0 30px; }
+  section .kicker-sm{ color: var(--maroon); font-size: 0.85rem; margin: 0 0 10px; font-weight: 500; }
+
+  /* ---- About ---- */
+  .about .wrap{ display: grid; grid-template-columns: 1fr 300px; gap: 56px; align-items: center; }
+  .about p{ margin: 0 0 16px; max-width: 54ch; }
+  .about p:last-child{ margin-bottom: 0; }
+  .about-art{ background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 22px; }
+
+  /* ---- Pieces: 6 col grid ---- */
+  .piece-grid{ display: grid; grid-template-columns: repeat(6, 1fr); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+  .piece-card{ padding: 22px 18px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); text-align: center; }
+  .piece-card .p-art{ height: 60px; display:flex; align-items:center; justify-content:center; margin-bottom: 12px; }
+  .piece-card h3{ font-size: 0.95rem; margin: 0 0 6px; }
+  .piece-card p{ margin: 0; font-size: 0.8rem; color: var(--muted); }
+
+  /* ---- Notation table ---- */
+  .notation-table{ width: 100%; border-collapse: collapse; }
+  .notation-table th, .notation-table td{ text-align: left; padding: 14px 16px; border-bottom: 1px solid var(--line); font-size: 0.95rem; }
+  .notation-table th{ font-family: 'Crimson Pro', serif; font-weight: 600; color: var(--maroon); font-size: 0.95rem; }
+  .notation-table td.sym{ font-family: 'IBM Plex Mono', monospace; font-weight: 600; white-space: nowrap; }
+
+  /* ---- Principles: numbered ---- */
+  .principles .wrap{ display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: start; }
+  .prin-list{ list-style: none; margin: 0; padding: 0; counter-reset: pr; }
+  .prin-list li{
+    counter-increment: pr;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: 30px 1fr;
+    gap: 14px;
+  }
+  .prin-list li:first-child{ padding-top: 0; }
+  .prin-list li:last-child{ border-bottom: none; }
+  .prin-list li::before{
+    content: counter(pr);
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--gold);
+    font-size: 0.9rem;
+  }
+  .prin-list .name{ display:block; font-weight: 600; margin-bottom: 2px; }
+  .prin-list .desc{ color: #34342C; font-size: 0.94rem; }
+  .prin-art{ background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 22px; align-self: start; }
+
+  /* ---- Openings grid ---- */
+  .opening-grid{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .opening-item{ background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 22px; }
+  .opening-item .tag{ font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; color: var(--gold); display:block; margin-bottom: 8px; }
+  .opening-item h3{ font-size: 1.05rem; margin: 0 0 6px; }
+  .opening-item p{ margin: 0; font-size: 0.88rem; color: var(--muted); }
+
+  /* ---- Contact ---- */
+  .community{ border-bottom: none; }
+  .community .wrap{ display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 48px; align-items: start; }
+  .community p{ margin: 0; grid-column: span 2; max-width: 56ch; color: #34342C; }
+  .contact-block{ display: flex; flex-direction: column; gap: 12px; }
+  .contact-block a{ text-decoration: none; border-bottom: 1px solid var(--maroon); padding-bottom: 1px; width: fit-content; }
+  .contact-block a:hover{ color: var(--gold); border-color: var(--gold); }
+
+  footer{ padding: 26px 0 44px; }
+  footer .wrap{ display: flex; justify-content: space-between; font-size: 0.82rem; color: var(--muted); }
+
+  @media (max-width: 940px){
+    header.hero .wrap{ grid-template-columns: 1fr; }
+    .about .wrap{ grid-template-columns: 1fr; }
+    .piece-grid{ grid-template-columns: repeat(3, 1fr); }
+    .principles .wrap{ grid-template-columns: 1fr; }
+    .opening-grid{ grid-template-columns: 1fr 1fr; }
+    .community .wrap{ grid-template-columns: 1fr; }
+    .community p{ grid-column: 1; }
+  }
+  @media (max-width: 560px){
+    .wrap{ padding: 0 22px; }
+    nav{ padding: 20px; }
+    .piece-grid{ grid-template-columns: 1fr 1fr; }
+    .opening-grid{ grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="brand">The Board</div>
+    <div class="nav-links">
+      <a href="#about">About</a>
+      <a href="#pieces">Pieces</a>
+      <a href="#notation">Notation</a>
+      <a href="#principles">Principles</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <p class="kicker fade-in">Notes on chess strategy</p>
+      <h1 class="fade-in delay-1">Sixty-four squares, and still no one has solved it</h1>
+      <p class="lede fade-in delay-2">A page on the fundamentals — how the pieces move, how games get recorded, and the handful of opening principles that hold up no matter who's across the board.</p>
+      <div class="hero-stats fade-in delay-2">
+        <div><strong>64</strong><span>squares on the board</span></div>
+        <div><strong>~10^120</strong><span>possible game positions</span></div>
+        <div><strong>16</strong><span>pieces per side</span></div>
+      </div>
+    </div>
+    <div class="hero-art fade-in delay-2">
+      <svg width="100%" viewBox="0 0 240 240">
+        <g>
+          <!-- 8x8 board, cell 25px, offset 20 -->
+          <script></script>
+        </g>
+        <rect x="20" y="20" width="200" height="200" stroke="#1C1C18" stroke-width="1.5" fill="none"/>
+        <g fill="#7A2E2E" fill-opacity="0.85">
+          <rect x="20" y="20" width="25" height="25"/><rect x="70" y="20" width="25" height="25"/><rect x="120" y="20" width="25" height="25"/><rect x="170" y="20" width="25" height="25"/>
+          <rect x="45" y="45" width="25" height="25"/><rect x="95" y="45" width="25" height="25"/><rect x="145" y="45" width="25" height="25"/><rect x="195" y="45" width="25" height="25"/>
+          <rect x="20" y="70" width="25" height="25"/><rect x="70" y="70" width="25" height="25"/><rect x="120" y="70" width="25" height="25"/><rect x="170" y="70" width="25" height="25"/>
+          <rect x="45" y="95" width="25" height="25"/><rect x="95" y="95" width="25" height="25"/><rect x="145" y="95" width="25" height="25"/><rect x="195" y="95" width="25" height="25"/>
+          <rect x="20" y="120" width="25" height="25"/><rect x="70" y="120" width="25" height="25"/><rect x="120" y="120" width="25" height="25"/><rect x="170" y="120" width="25" height="25"/>
+          <rect x="45" y="145" width="25" height="25"/><rect x="95" y="145" width="25" height="25"/><rect x="145" y="145" width="25" height="25"/><rect x="195" y="145" width="25" height="25"/>
+          <rect x="20" y="170" width="25" height="25"/><rect x="70" y="170" width="25" height="25"/><rect x="120" y="170" width="25" height="25"/><rect x="170" y="170" width="25" height="25"/>
+          <rect x="45" y="195" width="25" height="25"/><rect x="95" y="195" width="25" height="25"/><rect x="145" y="195" width="25" height="25"/><rect x="195" y="195" width="25" height="25"/>
+        </g>
+        <circle cx="82" cy="132" r="8" fill="#A9822F"/>
+        <circle cx="157" cy="82" r="8" fill="#1C1C18"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<section id="about" class="about">
+  <div class="wrap">
+    <div>
+      <h2>A game of ideas, not luck</h2>
+      <p>Chess has no hidden information and no element of chance — both players see the same board, and every mistake is entirely one's own. That's part of why it has held attention for over a thousand years: the game rewards understanding, not fortune.</p>
+      <p>What makes it endlessly replayable is scale. The number of possible legal positions is larger than the number of atoms in the observable universe, which is why even engines that calculate millions of moves a second haven't "solved" it.</p>
+    </div>
+    <div class="about-art">
+      <svg width="100%" viewBox="0 0 200 200" fill="none">
+        <path d="M100 40 L115 70 L100 90 L85 70 Z" fill="#1C1C18"/>
+        <rect x="85" y="90" width="30" height="10" fill="#1C1C18"/>
+        <rect x="75" y="100" width="50" height="14" fill="#1C1C18"/>
+        <rect x="70" y="114" width="60" height="12" fill="#1C1C18"/>
+        <circle cx="100" cy="30" r="7" fill="#7A2E2E"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section id="pieces">
+  <div class="wrap">
+    <h2>How each piece moves</h2>
+    <div class="piece-grid">
+      <div class="piece-card">
+        <div class="p-art"><svg width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="10" r="6" fill="#1C1C18"/><rect x="9" y="18" width="16" height="10" fill="#1C1C18"/></svg></div>
+        <h3>Pawn</h3>
+        <p>One square forward, captures diagonally</p>
+      </div>
+      <div class="piece-card">
+        <div class="p-art"><svg width="34" height="34" viewBox="0 0 34 34"><path d="M8 28 L10 14 L20 6 L26 14 L22 20 L26 28 Z" fill="#1C1C18"/></svg></div>
+        <h3>Knight</h3>
+        <p>An L-shape — two squares, then one across</p>
+      </div>
+      <div class="piece-card">
+        <div class="p-art"><svg width="34" height="34" viewBox="0 0 34 34"><ellipse cx="17" cy="16" rx="7" ry="10" fill="#1C1C18"/><rect x="12" y="26" width="10" height="4" fill="#1C1C18"/></svg></div>
+        <h3>Bishop</h3>
+        <p>Any distance, diagonally only</p>
+      </div>
+      <div class="piece-card">
+        <div class="p-art"><svg width="34" height="34" viewBox="0 0 34 34"><rect x="9" y="8" width="16" height="6" fill="#1C1C18"/><rect x="11" y="14" width="12" height="14" fill="#1C1C18"/></svg></div>
+        <h3>Rook</h3>
+        <p>Any distance, horizontally or vertically</p>
+      </div>
+      <div class="piece-card">
+        <div class="p-art"><svg width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="8" r="4" fill="#7A2E2E"/><path d="M9 28 L11 14 L23 14 L25 28 Z" fill="#1C1C18"/></svg></div>
+        <h3>Queen</h3>
+        <p>Any distance, any direction</p>
+      </div>
+      <div class="piece-card">
+        <div class="p-art"><svg width="34" height="34" viewBox="0 0 34 34"><path d="M15 6 h4 v4 h4 v4 h-4 v4 h-4 v-4 h-4 v-4 h4 z" fill="#7A2E2E"/><path d="M9 28 L11 18 L23 18 L25 28 Z" fill="#1C1C18"/></svg></div>
+        <h3>King</h3>
+        <p>One square, any direction</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="notation">
+  <div class="wrap">
+    <h2>Reading algebraic notation</h2>
+    <table class="notation-table">
+      <thead>
+        <tr><th>Symbol</th><th>Meaning</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="sym">e4</td><td>Pawn moves to square e4 (files a–h, ranks 1–8)</td></tr>
+        <tr><td class="sym">Nf3</td><td>Knight moves to f3 — capital letters name the piece</td></tr>
+        <tr><td class="sym">Bxc6</td><td>Bishop captures whatever is on c6</td></tr>
+        <tr><td class="sym">O-O</td><td>Castling on the king's side</td></tr>
+        <tr><td class="sym">+</td><td>Check — the king is under direct attack</td></tr>
+        <tr><td class="sym">#</td><td>Checkmate — the game ends</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="principles" class="principles">
+  <div class="wrap">
+    <div>
+      <p class="kicker-sm">The opening</p>
+      <h2>Four principles that rarely fail</h2>
+      <ol class="prin-list">
+        <li><span class="desc"><span class="name">Control the centre</span>Pieces placed near the middle four squares influence more of the board than pieces on the edge.</span></li>
+        <li><span class="desc"><span class="name">Develop before you attack</span>Get knights and bishops into play before moving the same piece twice or chasing an early attack.</span></li>
+        <li><span class="desc"><span class="name">Castle early</span>Moving the king to safety and connecting the rooks usually matters more than grabbing material.</span></li>
+        <li><span class="desc"><span class="name">Don't move the queen out too soon</span>An early queen sortie tends to get chased around the board, losing time.</span></li>
+      </ol>
+    </div>
+    <div class="prin-art">
+      <svg width="100%" viewBox="0 0 220 220" fill="none">
+        <rect x="10" y="10" width="200" height="200" stroke="#1C1C18" stroke-width="1.5" fill="none"/>
+        <rect x="85" y="85" width="50" height="50" fill="#7A2E2E" fill-opacity="0.6"/>
+        <line x1="10" y1="60" x2="210" y2="60" stroke="#C7C7B8" stroke-width="1"/>
+        <line x1="10" y1="110" x2="210" y2="110" stroke="#C7C7B8" stroke-width="1"/>
+        <line x1="10" y1="160" x2="210" y2="160" stroke="#C7C7B8" stroke-width="1"/>
+        <line x1="60" y1="10" x2="60" y2="210" stroke="#C7C7B8" stroke-width="1"/>
+        <line x1="110" y1="10" x2="110" y2="210" stroke="#C7C7B8" stroke-width="1"/>
+        <line x1="160" y1="10" x2="160" y2="210" stroke="#C7C7B8" stroke-width="1"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section id="openings">
+  <div class="wrap">
+    <h2>A few well-known openings</h2>
+    <div class="opening-grid">
+      <div class="opening-item">
+        <span class="tag">1. e4 e5 2. Nf3 Nc6 3. Bb5</span>
+        <h3>Ruy López</h3>
+        <p>One of the oldest recorded openings, pressuring the knight defending e5 from the flank.</p>
+      </div>
+      <div class="opening-item">
+        <span class="tag">1. e4 c5</span>
+        <h3>Sicilian Defence</h3>
+        <p>The most popular reply to e4 at top level — sharp, asymmetric, and fights for the centre from the side.</p>
+      </div>
+      <div class="opening-item">
+        <span class="tag">1. d4 Nf6 2. c4 g6</span>
+        <h3>King's Indian Defence</h3>
+        <p>Black concedes the centre early, then counterattacks it later with pawns and pieces.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact" class="community">
+  <div class="wrap">
+    <h2 style="grid-column: 1 / -1;">Get in touch</h2>
+    <p>If you've spotted an error in the notation or have a principle worth adding, write in. This page is meant to stay accurate more than exhaustive.</p>
+    <div class="contact-block">
+      <a href="mailto:hello@theboard.example">hello@theboard.example</a>
+      <a href="#">RSS feed</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 The Board</span>
+    <span>notes on chess strategy</span>
+  </div>
+</footer>
+
+</body>
+</html>
